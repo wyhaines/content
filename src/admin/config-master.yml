@@ -1,0 +1,85 @@
+backend:
+  name: gitlab
+  branch: master # Branch to update (optional; defaults to master)
+  repo: group/repo # Path to your GitLab repository
+  auth_type: implicit # Required for implicit grant
+  app_id: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX # Application ID from your GitLab settings
+  api_root: https://gitlab.your.domain/api/v4
+  base_url: https://gitlab.your.domain
+  auth_endpoint: oauth/authorize
+media_folder: "src/assets" # Media files will be stored in the repo under images/uploads
+public_folder: "/assets"
+display_url: "https://your.application.com"
+logo_url: "https://your.application.com/assets/logo.png"
+slug:
+  encoding: "unicode"
+  clean_accents: true
+collections:
+  - name: layouts
+    label: Layouts
+    folder: "src/_layouts"
+    create: true
+    format: "yaml-frontmatter"
+    extension: html
+    fields:
+      - {label: Layout, name: layout, widget: string, default: default, required: true}
+      - {label: Title, name: title, widget: string, required: true}
+      - {label: Body, name: body, widget: markdown, required: true}
+  - name: includes
+    label: Includes
+    folder: "src/_includes"
+    create: true
+    format: "yaml-frontmatter"
+    extension: html
+    fields:
+      - {label: Title, name: title, widget: string, required: true}
+      - {label: Body, name: body, widget: markdown, required: true}
+  - name: samples
+    label: Samples
+    label_singular: Sample
+    folder: "src/_samples"
+    create: true
+    format: "yaml-frontmatter"
+    extension: "md"
+    identifier_field: name
+    fields:
+      - {label: Layout, name: layout, widget: hidden, default: 'default', required: true}
+      - {label: Name, name: name, widget: string, required: true}
+      - label: Tags
+        name: tags
+        widget: select
+        multiple: true
+        default: ["one"]
+        options:
+          - {label: "Thing one", value: "one"}
+          - {label: "Thing two", value: "two"}
+          - {label: "Thing three", value: "three"}
+      - {label: Blurb, name: blurb, widget: markdown, required: false}
+      - {label: Order, name: order, widget: string, default: "0", required: true}
+      - {label: Image, name: image, widget: image, required: false}
+      - {label: Additional, name: body, widget: markdown, required: false}
+  - name: pages
+    label: Pages
+    folder: "src/_pages"
+    create: true
+    format: "yaml-frontmatter"
+    extension: html
+    fields:
+      - {label: Layout, name: layout, widget: select, default: default, options: ["default", "uncompressed-default"]}
+      - {label: Title, name: title, widget: string, required: true}
+      - {label: Header, name: header, widget: markdown}
+      - {label: Page ID, name: pageid, widget: string, required: true}
+      - {label: Permalink, name: permalink, widget: string, default: "//"}
+      - {label: Body, name: body, widget: markdown, required: true}
+  - name: posts
+    label: Posts
+    folder: "src/_posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: Layout, name: layout, widget: hidden, default: post}
+      - {label: Title, name: title, widget: string}
+      - {label: Keywords, name: keywords, widget: string, required: false}
+      - {label: Description, name: description, widget: string, required: false}
+      - {label: Thumbnail, name: thumbnail, widget: image, required: false}
+      - {label: Body, name: body, widget: markdown, required: false}

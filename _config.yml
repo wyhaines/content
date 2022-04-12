@@ -1,0 +1,68 @@
+# Site settings
+title: Wyhaines.com
+subtitle: A collection of Kirk's thoughts.
+email: wyhaines@gmail.com
+description: > # this means to ignore newlines until "baseurl:"
+  Kirk Haines; this is my stuff.
+domain: wyhaines.github.io
+baseurl: "/content/" # the subpath of your site, e.g. /blog
+url: "wyhaines.github.io" # the base hostname & protocol for your site
+twitter_username: wyhaines
+github_username:  wyhaines
+
+# Outputting
+permalink: /:categories/:year/:month/:day/:slug:output_ext
+
+# SASS
+sass:
+  sass_dir: _sass
+#  style: compressed
+
+# Build settings
+exclude: ["README.md"]
+# Build settings
+markdown: kramdown
+plugins_dir:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-include-with-frontmatter
+  - jekyll-picture-tag
+
+source: src/
+destination: docs
+
+include:
+  - _pages
+
+defaults:
+  # _pages
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: default
+      comments: false
+collections:
+  samples:
+    output: true
+
+# Edit Author details (For multi authors check _data/authors.yml)
+
+author_logo: KirkWave-112px.png
+author: Kirk Haines
+author_bio: Hi, my name is Kirk Haines.
+author_email: "wyhaines@gmail.com"
+author_location: United States
+author_website_url: "https://wyhaines.com"
+typewrite-text: Welcome to my humble little home on the internet.
+paginate: 20
+
+urls:
+    - text: Home
+      url: /
+    - text: About
+      url: /about
+    - text: Blog
+      url: /blog
+    - text: Contact
+      url : /contact
