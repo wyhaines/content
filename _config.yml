@@ -28,7 +28,6 @@ plugins_dir:
   - jekyll-include-with-frontmatter
   - jekyll-picture-tag
 
-source: ./src/
 destination: docs
 
 include:
