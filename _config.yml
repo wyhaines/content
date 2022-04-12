@@ -4,9 +4,9 @@ subtitle: A collection of Kirk's thoughts.
 email: wyhaines@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   Kirk Haines; this is my stuff.
-domain: wyhaines.github.io
-baseurl: "/content/" # the subpath of your site, e.g. /blog
-url: "wyhaines.github.io" # the base hostname & protocol for your site
+domain: wyhaines.com
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "wyhaines.com" # the base hostname & protocol for your site
 twitter_username: wyhaines
 github_username:  wyhaines
 
