@@ -36,3 +36,6 @@ So let's take a look at what that really means. How does one implement OpenTelem
 
 The first approach to instrumenting your Crystal code is to leverage the [OpenTelemetry API](https://github.com/wyhaines/opentelemetry-api.cr) to manually insert instrumentation where you need it.
 
+
+
+OpenTelemetry generally requires a small amount of up-front configuration in order to make the best use of it. You will generally want to provide a *service_name*, a *service_version*, and *exporter* when initializing the API.
