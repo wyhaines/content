@@ -36,6 +36,174 @@ So let's take a look at what that really means. How does one implement OpenTelem
 
 The first approach to instrumenting your Crystal code is to leverage the [OpenTelemetry API](https://github.com/wyhaines/opentelemetry-api.cr) to manually insert instrumentation where you need it.
 
+Let's look at a small example. Consider a small service, built with just the Crystal standard library, that responds to HTTP GET requests by calculating the nth Fibonacci number. The code below isn't the most terse way to do it in Crystal, but it's structured in a way that would reasonably lend itself towards being expanded into a larger, more complex service.
 
+#### **`fibonacci.cr`**
+```crystal
+require "http/server"
+require "big/big_int"
+
+class Fibonacci
+  VERSION = "1.0.0"
+  private getter finished : Channel(Nil) = Channel(Nil).new
+
+  def fibonacci(x)
+    a, b = x > 93 ? {BigInt.new(0), BigInt.new(1)} : {0_u64, 1_u64}
+
+    (x - 1).times do
+      a, b = b, a + b
+    end
+    a
+  end
+
+  def run
+    spawn(name: "Fibonacci Server") do
+      server = HTTP::Server.new([
+        HTTP::ErrorHandler.new,
+        HTTP::LogHandler.new,
+        HTTP::CompressHandler.new,
+      ]) do |context|
+        n = context.request.query_params["n"]?
+
+        if n && n.to_i > 0
+          answer = fibonacci(n.to_i)
+          context.response << answer.to_s
+          context.response.content_type = "text/plain"
+        else
+          context.response.respond_with_status(400,
+            "Please provide a positive integer as the 'n' query parameter")
+        end
+      end
+
+      server.bind_tcp "0.0.0.0", 5000
+      server.listen
+    end
+
+    self
+  end
+
+  def wait
+    finished.receive
+  end
+end
+
+```
+
+To run this, you might have a second file that does something like this:
+
+#### **`server.cr`**
+```crystal
+require "./fibonacci"
+Fibonacci.new.run.wait
+```
+
+The full code for this small, uninstrumented application can be viewed at [https://github.com/newrelic-experimental/mcv3-apps/tree/kh.add-crystal-example-20220412/Uninstrumented/crystal](https://github.com/newrelic-experimental/mcv3-apps/tree/kh.add-crystal-example-20220412/Uninstrumented/crystal).
+
+If you pull the code from that repository, you can follow the instructions there to run it. The TL;DR is:
+
+```bash
+crystal build -p -s -t --release src/server.cr
+./server
+```
+
+### Instrumenting Your Application
 
 OpenTelemetry generally requires a small amount of up-front configuration in order to make the best use of it. You will generally want to provide a *service_name*, a *service_version*, and *exporter* when initializing the API.
+
+So, let's require the instrumentation package in `fibonacci.cr`, and add it's configuration to `server.cr`:
+
+#### **`fibonacci.cr`**
+```crystal
+require "http/server"
+require "big/big_int"
+require "opentelemetry-api"
+
+```
+
+#### **`server.cr`**
+```crystal
+require "./fibonacci"
+
+OpenTelemetry.configure do |config|
+  config.service_name = "Fibonacci Server"
+  config.service_version = Fibonacci::VERSION
+  config.exporter = OpenTelemetry::Exporter.new(variant: :http) do |exporter|
+    exporter = exporter.as(OpenTelemetry::Exporter::Http)
+    exporter.endpoint = "https://otlp.nr-data.net:4318/v1/traces"
+    headers = HTTP::Headers.new
+    headers["api-key"] = ENV["NEW_RELIC_LICENSE_KEY"]?.to_s
+    exporter.headers = headers
+  end
+end
+
+Fibonacci.new.run.wait
+```
+
+The above code block does three things. It sets the service_name and the service_version in the configuration, and then it defines the exporter to use. There are a variety of exporters that are provided. Some, are just used for testing, like the `:stdout` exporter (dumps the OpenTelemetry data to STDOUT, as JSON). Some can be used for testing or for piping the OpenTelemetry data to another service, like the `:io`, and some are used for sending the data to your backend observability platform of choice, like New Relic. The `:http` variant, with a class name of `OpenTelemetry::Exporter::Http`, is used to deliver data using the `OTLP/HTTP` protocol.
+
+Using that protocol with New Relic requires providing a license key so that the New Relic data ingest systems can deliver that data to the correct account. The other code attaches a set of custom HTTP headers to the exporter, which will be set on every request, and sets one of those headers to be the license key, which is assumed to be stored within the `NEW_RELIC_LICENSE_KEY` environment variable.
+
+The only step that is left is to add some actual instrumentation. OpenTelemetry Traces operate off of a data model where a `Trace` is essentially a container for other data, one portion of which is an array of `Span`s. A `Span` is a unit of work, with a distinct start and end time, a name, and some other metadata, as well as an option set of attributes and events. Thus, a trace is composed of one or more spans.
+
+If we want to collect data on how long it takes to calculate the Fibonacci numbers, as well as what numbers are being calculated, we can instrument the `fibonacci` method to do this:
+
+#### **`fibonacci.cr`**
+```crystal
+def fibonacci(x)
+  trace = OpenTelemetry.trace # Get the current trace or start a new one
+  trace.in_span("Calculate Fibonacci ##{x}") do |span|
+    a, b = x > 93 ? {BigInt.new(0), BigInt.new(1)} : {0_u64, 1_u64}
+
+    (x - 1).times do
+      a, b = b, a + b
+    end
+
+    span["fibonacci.n"] = x
+    span["fibonacci.result"] = a
+
+    a
+  end
+end
+```
+
+That is all that you need to do. Now, if you recompile the code, and start the server with your license key:
+
+```base
+NEW_RELIC_LICENSE_KEY=<your license key> ./server
+```
+
+Any time a request comes into the server that results in the calculation of a fibonacci number, a trace will be created, and it will be sent back to New Relic, where it can be viewed in New Relic One.
+
+### What About Errors, And Everything Else?
+
+One thing that might occur to you is that the above only traces a small part of the whole process. This is true, and if you wanted to instrument the rest of it, and capture errors, you could write more custom instrumentation, and even write patches to the standard library to instrument its internals, or an instrumentation handler that can be injected into the HTTP request handler chain for an application. That's a lot of writing, though.
+
+The OpenTelemetry Instrumentation package, however, provides many prebuilt instrumentation packages that can be installed into your application just by requiring them.
+
+To do this, first change the require block at the top of the `fibonacci.cr` file to:
+
+#### **`fibonacci.cr`**
+```crystal
+require "http/server"
+require "big/big_int"
+require "opentelemetry-instrumentation"
+
+```
+
+Then, instead of doing what we showed above, to instrument your `#fibonacci` method, you can do so more concisely by adding the following block to your `server.cr` file:
+
+
+#### **`server.cr`**
+```crystal
+class Fibonacci
+  trace("fibonacci") do
+    OpenTelemetry.trace.in_span("fibonacci(#{x})") do |span|
+      span["fibonacci.n"] = x
+      result = previous_def
+      span["fibonacci.result"] = result.to_s
+    end
+  end
+end
+```
+
+This time, when you run the server, the auto-instrumentation will instrument the entire HTTP::Server request/response cycle, and it will also instrument the `Log` class provided by the standard library, so that any generated logs from the application get added to the spans where they occur, as events (in the future these will be first class OpenTelemetry Log records).
