@@ -207,3 +207,23 @@ end
 ```
 
 This time, when you run the server, the auto-instrumentation will instrument the entire HTTP::Server request/response cycle, and it will also instrument the `Log` class provided by the standard library, so that any generated logs from the application get added to the spans where they occur, as events (in the future these will be first class OpenTelemetry Log records).
+
+Here is what it looks like, after running the service and sending requests to it for a few minutes:
+
+![New Relic One ungrouped traces](new_relic_one_traces.png)
+
+You can click on one of those traces, and drill down into it to get deeper, more specific information, too:
+
+![New Relic One OpenTelemetry Trace Details](trace_details.png)
+
+The full code for the instrumented version of the Fibonacci app can be found here: [https://github.com/newrelic-experimental/mcv3-apps/tree/kh.add-crystal-example-20220412/Instrumented/crystal](https://github.com/newrelic-experimental/mcv3-apps/tree/kh.add-crystal-example-20220412/Instrumented/crystal).
+
+## What's Next?
+
+This Fibonacci example is basic. Most services, even the most basic ones, will need to do more than just calculate Fibonacci numbers. However, even without adding custom instrumentation, most applications will start returning useful, actionable tracing with only the auto-instrumentation.
+
+The suite of packages for which autoinstrumentation exists will continue to expand in the future, and there is a roadmap of other OpenTelemetry features that will be coming, as well, including support for OpenTelemetry Metrics and Logs, as well as support for Samplers and for other export options (like Jaeger), and in general increasing the compliance of the Crystal OpenTelemetry implementation with the OpenTelemetry specification.
+
+If you want to learn more details about the OpenTelemetry implementation itself, refer to the [OpenTelemetry API](https://github.com/wyhaines/opentelemetry-api.cr) repository. Likewise, if you want to learn more about the instrumentation and how it is build, refer to the [https://github.com/wyhaines/opentelemetry-instrumentation.cr] repository.
+
+New Relic is committed to the CNCF and the OpenTelemetry ecosystem, but if you are new to OpenTelemetry and want to know more about what it is and what you can do with it, one resource that I would recommend is our own [OpenTelemetry MasterClass](https://developer.newrelic.com/opentelemetry-masterclass/).
