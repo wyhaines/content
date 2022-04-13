@@ -2,7 +2,7 @@
 
 ## Wait. Crystal?
 
-If you have not heard of Crystal before, it deserves a quick introduction. Crystal is a general-purpose, object-oriented programming language, with a syntax that is heavily influenced by Ruby, with a sprinkling of influence from Go and others. It is a compiled language with static type-checking, but it features a powerful type inference system that eliminates much of the need to write explicit typing. It's not a stretch to say that Crystal provides all of the productivity of a language like Ruby, all of the benfits of static type checking (without most of the disadvantages), and exceptional performance that is competitive with the fastest high level languages available today.
+If you have not heard of Crystal before, it deserves a quick introduction. Crystal is a general-purpose, object-oriented programming language, with a syntax that is heavily influenced by Ruby, with a sprinkling of influence from Go and others. It is a compiled language with static type-checking, but it features a powerful type inference system that eliminates much of the need to write explicit typing. It's not a stretch to say that Crystal provides all of the productivity of a language like Ruby, all of the benfits of static type checking (without many of the disadvantages), and exceptional performance that is competitive with the fastest high level languages available today.
 
 If Crystal is new to you, after you finish reading here, you may want to take a look at the [Crystal Book](https://crystal-lang.org/reference/1.4/index.html) to learn more about the language.
 
