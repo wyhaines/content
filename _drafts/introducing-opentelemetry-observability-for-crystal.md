@@ -220,7 +220,7 @@ The full code for the instrumented version of the Fibonacci app can be found her
 
 ## What's Next?
 
-This Fibonacci example is basic. Most services, even the most basic ones, will need to do more than just calculate Fibonacci numbers. However, even without adding custom instrumentation, most applications will start returning useful, actionable tracing with only the auto-instrumentation.
+This Fibonacci example is basic. Most services, even the most rudimentary ones, will need to do more than just calculate Fibonacci numbers. However, even without adding custom instrumentation, most applications will start returning useful, actionable tracing with only the auto-instrumentation.
 
 The suite of packages for which autoinstrumentation exists will continue to expand in the future, and there is a roadmap of other OpenTelemetry features that will be coming, as well, including support for OpenTelemetry Metrics and Logs, as well as support for Samplers and for other export options (like Jaeger), and in general increasing the compliance of the Crystal OpenTelemetry implementation with the OpenTelemetry specification.
 
