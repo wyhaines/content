@@ -16,7 +16,7 @@ At the simplest end of things, logging provides a vehicle for observability, but
 
 Filling this gap are observability platforms. If you build an application using Ruby on Rails, you can, with just a few additional lines in your project, add observability to your project. As it runs, data will be delivered to a backend platform to allow you to know what is what is fast, what is slow, and what is failing. You can dig into the collected information to move from what is broken to why it is broken. This ability makes it far more accessible to maintain production systems, and that makes it almost indispensable for many teams.
 
-Crystal, while fairly mature, had not received a lot of attention from existing observability platforms. There is no proprietary observability agent for Crystal from New Relic or any of the other top observability providers. Observability, however, as highlighted in the conversation that I observed, is a crucial tool for many production systems, particularly customer-facing production systems.
+Crystal, while fairly mature, had not received a lot of attention from existing observability platforms. There is no proprietary observability agent for Crystal from New Relic or any of the other top observability providers. Observability, however, as highlighted in the chat conversation that I observed, is a crucial tool for many production systems, particularly customer-facing production systems.
 
 ## OpenTelemetry?
 
@@ -36,7 +36,7 @@ So let's take a look at what that really means. How does one implement OpenTelem
 
 The first approach to instrumenting your Crystal code is to leverage the [OpenTelemetry API](https://github.com/wyhaines/opentelemetry-api.cr) to manually insert instrumentation where you need it.
 
-Let's look at a small example. Consider a small service, built with just the Crystal standard library, that responds to HTTP GET requests by calculating the nth Fibonacci number. The code below isn't the most terse way to do it in Crystal, but it's structured in a way that would reasonably lend itself towards being expanded into a larger, more complex service.
+Let's look at a small example. Consider a basic service, built with just the Crystal standard library, that responds to HTTP GET requests by calculating the nth Fibonacci number. The code below isn't the most terse way to do it in Crystal, but it's structured in a way that would reasonably lend itself towards being expanded into a larger, more complex service.
 
 #### **`fibonacci.cr`**
 ```crystal
@@ -97,7 +97,7 @@ require "./fibonacci"
 Fibonacci.new.run.wait
 ```
 
-The full code for this small, uninstrumented application can be viewed at [https://github.com/newrelic-experimental/mcv3-apps/tree/kh.add-crystal-example-20220412/Uninstrumented/crystal](https://github.com/newrelic-experimental/mcv3-apps/tree/kh.add-crystal-example-20220412/Uninstrumented/crystal).
+The full code for this basic, uninstrumented application can be viewed at [https://github.com/newrelic-experimental/mcv3-apps/tree/kh.add-crystal-example-20220412/Uninstrumented/crystal](https://github.com/newrelic-experimental/mcv3-apps/tree/kh.add-crystal-example-20220412/Uninstrumented/crystal).
 
 If you pull the code from that repository, you can follow the instructions there to run it. The TL;DR is:
 
@@ -108,9 +108,9 @@ crystal build -p -s -t --release src/server.cr
 
 ### Instrumenting Your Application
 
-OpenTelemetry generally requires a small amount of up-front configuration in order to make the best use of it. You will generally want to provide a *service_name*, a *service_version*, and *exporter* when initializing the API.
+OpenTelemetry generally requires a small amount of up-front configuration in order to make the best use of it. You will generally want to provide a *service_name*, a *service_version*, and an *exporter* when initializing the API.
 
-So, let's require the instrumentation package in `fibonacci.cr`, and add it's configuration to `server.cr`:
+So, let's require the OpenTelemetr package in `fibonacci.cr`, and add its configuration to `server.cr`:
 
 #### **`fibonacci.cr`**
 ```crystal
@@ -139,11 +139,11 @@ end
 Fibonacci.new.run.wait
 ```
 
-The above code block does three things. It sets the service_name and the service_version in the configuration, and then it defines the exporter to use. There are a variety of exporters that are provided. Some, are just used for testing, like the `:stdout` exporter (dumps the OpenTelemetry data to STDOUT, as JSON). Some can be used for testing or for piping the OpenTelemetry data to another service, like the `:io`, and some are used for sending the data to your backend observability platform of choice, like New Relic. The `:http` variant, with a class name of `OpenTelemetry::Exporter::Http`, is used to deliver data using the `OTLP/HTTP` protocol.
+The above code block does a couple of things. It sets the service_name and the service_version in the configuration, and then it defines the exporter to use. There are a variety of exporters that are provided. Some, are just used for testing, like the `:stdout` exporter (dumps the OpenTelemetry data to STDOUT, as JSON). Some can be used for testing or for piping the OpenTelemetry data to another service, like the `:io`, and some are used for sending the data to your backend observability platform of choice, like New Relic. The `:http` variant, with a class name of `OpenTelemetry::Exporter::Http`, is used to deliver data using the [`OTLP/HTTP`](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlphttp) protocol.
 
-Using that protocol with New Relic requires providing a license key so that the New Relic data ingest systems can deliver that data to the correct account. The other code attaches a set of custom HTTP headers to the exporter, which will be set on every request, and sets one of those headers to be the license key, which is assumed to be stored within the `NEW_RELIC_LICENSE_KEY` environment variable.
+Using that protocol with New Relic requires a license key so that the New Relic data ingest systems can deliver that data to the correct account. The other code attaches a set of custom HTTP headers to the exporter, which will be set on every request, and sets one of those headers to be the license key, which is assumed to be stored within the `NEW_RELIC_LICENSE_KEY` environment variable.
 
-The only step that is left is to add some actual instrumentation. OpenTelemetry Traces operate off of a data model where a `Trace` is essentially a container for other data, one portion of which is an array of `Span`s. A `Span` is a unit of work, with a distinct start and end time, a name, and some other metadata, as well as an option set of attributes and events. Thus, a trace is composed of one or more spans.
+The only step that is left is to add some actual instrumentation. OpenTelemetry Traces operate off of a data model where a `Trace` is essentially a container for other data, one portion of which is an array of `Span`s. A `Span` is a unit of work, with a distinct start and end time, a name, and some other metadata, as well as an option set of attributes and events. Thus, a trace is composed of one or more spans, and spans contain all of the detailed information.
 
 If we want to collect data on how long it takes to calculate the Fibonacci numbers, as well as what numbers are being calculated, we can instrument the `fibonacci` method to do this:
 
@@ -176,7 +176,7 @@ Any time a request comes into the server that results in the calculation of a fi
 
 ### What About Errors, And Everything Else?
 
-One thing that might occur to you is that the above only traces a small part of the whole process. This is true, and if you wanted to instrument the rest of it, and capture errors, you could write more custom instrumentation, and even write patches to the standard library to instrument its internals, or an instrumentation handler that can be injected into the HTTP request handler chain for an application. That's a lot of writing, though.
+One thing that might occur to you is that the above code only traces a small part of the whole process. This is true, and if you wanted to instrument the rest of it, and capture errors, you could write more custom instrumentation, and even write patches to the standard library to instrument its internals, or an instrumentation handler that can be injected into the HTTP request handler chain for an application. That's a lot of writing, though.
 
 The OpenTelemetry Instrumentation package, however, provides many prebuilt instrumentation packages that can be installed into your application just by requiring them.
 
@@ -190,8 +190,7 @@ require "opentelemetry-instrumentation"
 
 ```
 
-Then, instead of doing what we showed above, to instrument your `#fibonacci` method, you can do so more concisely by adding the following block to your `server.cr` file:
-
+Then, instead of doing what was shown above, to instrument your `#fibonacci` method, you can do so more concisely by adding the following block to your `server.cr` file:
 
 #### **`server.cr`**
 ```crystal
