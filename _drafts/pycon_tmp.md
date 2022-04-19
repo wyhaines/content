@@ -16,6 +16,6 @@ The list of sessions for this year's PyCon is packed with interesting content, a
 
 For everyone is facing making these decisions over and over again for three days, I wish you well.
 
-For those of you who are getting into Salt Lake City in tome for the workshops on the 28th, though, I suggest that you make time to attend the [*How we build software: a development and collaboration workflow to minimise context switching*](https://us.pycon.org/2022/schedule/presentation/166/) workshop. If you have never used it before, it isn't a stretch to say that, [CodeStream](https://www.codestream.com/) can do some amazing things to help minimize context switching in your daily development workflow. It's a tool that is well worth learning how to use, and I highly recommend it.
+For those of you who are getting into Salt Lake City in tome for the workshops on the 28th, though, I suggest that you make time to attend the [*How we build software: a development and collaboration workflow to minimise context switching*](https://us.pycon.org/2022/schedule/presentation/166/) workshop. If you have never used it before, it isn't a stretch to say that [CodeStream](https://www.codestream.com/) can do some amazing things to help minimize context switching in your daily development workflow. It's a tool that is well worth learning how to use, and I highly recommend it.
 
-For me, this event kicks of the spring/summer conference season, and I am looking forward to attending my first PyCon. Please stop by the New Relic booth and say hi. I hope to see you there.
+For me, this event kicks of the spring/summer conference season, and I am looking forward to attending my first PyCon. Please stop by the New Relic booth and say "Hi!" I hope to see you there.
