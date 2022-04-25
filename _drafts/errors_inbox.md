@@ -44,7 +44,7 @@ If it is something that should be worked on in this sprint, it can be assigned f
 
 ![Assign an error](./error_assign.png)
 
-In addition, the JIRA integration, which is also accessible via a dropdown, lets you create the JIRA issue to track this bug, right from this same interface. You
+In addition, the JIRA integration, which is also accessible via a dropdown, lets you create the JIRA issue to track this bug, right from this same interface.
 ![Create a Jira issue](./jira_create.png)
 
 As a team, you can quickly identify the major errors that are affecting your areas of responsibility, triage them, and assign them, without ever leaving the Errors inbox.
