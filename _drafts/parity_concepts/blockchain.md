@@ -1,0 +1,3 @@
+# Blockchain
+
+[Blockchain](https://en.wikipedia.org/wiki/Blockchain) is a distributed database that maintains a continuously growing list of ordered records called blocks. Each block contains a cryptographic hash of the previous block, a timestamp, and transaction data. By design, blockchains are inherently resistant to modification of the data. A blockchain is typically managed by a peer-to-peer network collectively adhering to a protocol for validating new blocks. Once recorded, the data in any given block cannot be altered retroactively without alteration of all subsequent blocks, which requires collusion of the network majority.
