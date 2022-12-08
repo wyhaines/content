@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CheatAtRockPaperScissors
-  def run(filename)
+  def initialize(filename)
     plays = File.read(filename).split("\n").map { |line| line.split(' ') }
 
     score, wins, losses, draws = simulate_games(normalize plays)
@@ -78,5 +78,4 @@ class CheatAtRockPaperScissors
   end
 end
 
-game = CheatAtRockPaperScissors.new
-game.run(ARGV[0] || 'input.txt')
+CheatAtRockPaperScissors.new(ARGV[0] || 'input.txt')
