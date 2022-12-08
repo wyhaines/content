@@ -1,4 +1,5 @@
 use std::fs;
+use std::env;
 
 enum Play {
     Rock,
@@ -8,9 +9,12 @@ enum Play {
 }
 
 fn main() {
-    // Read the input file
-    let text = fs::read_to_string("input.txt").unwrap();
-    // Split the input by newline characters, and then split each line by whitespace
+    let args: Vec<String> = env::args().collect();
+    let mut filename = "input.txt";
+    if let Some(arg) = args.get(1) {
+        filename = arg;
+    }
+    let text = fs::read_to_string(filename).unwrap();
     let plays = text
         .split("\n")
         .map(|line| line.trim().split_whitespace().collect::<Vec<_>>())
