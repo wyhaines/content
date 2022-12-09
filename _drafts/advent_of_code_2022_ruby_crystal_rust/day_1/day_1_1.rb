@@ -1,5 +1,5 @@
 the_most_calories = File.read('input.txt')
-                        .split(/^$/m)
+                        .split(/\n\n/m)
                         .map do |group|
   group
     .strip
