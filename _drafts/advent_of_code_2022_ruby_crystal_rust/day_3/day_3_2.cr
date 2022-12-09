@@ -7,16 +7,16 @@ class RuckSackn
   end
 
   def parse_rucksacks(filename)
-    File.read(filename).split("\n").map do |line|
-      middle = line.size // 2
-      left = line[0..(middle - 1)]
-      right = line[middle..]
-      {left, right}
+    rucksacks = [] of Tuple(String, String, String)
+    File.read(filename).split("\n").each_slice(3) do |trio|
+      rucksacks << {trio[0], trio[1], trio[2]} if trio.size == 3
     end
+
+    rucksacks
   end
 
-  def find_duplicates(left, right)
-    left.split("") & right.split("")
+  def find_duplicates(left, middle, right)
+    left.split("") & middle.split("") & right.split("")
   end
 
   def item_priority(items)
