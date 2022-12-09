@@ -5,7 +5,7 @@ class RuckSackn
       rucksacks = parse_rucksacks(filename)
       sum = rucksacks.map { |rucksack| item_priority(find_duplicates(*rucksack)) }.sum
 
-      puts "Priority sum of all duplicated items: #{sum.inspect}"
+      puts "Priority sum of all duplicated items: #{sum}"
     end
 
   def parse_rucksacks(filename)
