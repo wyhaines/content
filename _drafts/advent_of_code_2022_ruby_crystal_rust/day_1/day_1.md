@@ -31,7 +31,15 @@ The fourth elf would be carrying 24000 calories, and that would be the answer to
 
 ### The Approach
 
-The task is to read the input, delimited by the blank lines, and then sum the numbers in each chunk. This is pretty straight forward in Ruby, and so this first solution is going to be presented as a short, imperative solution in order to ease into this process.
+The approach to solving this puzzle involves the following steps:
+
+1) read the input
+2) split it into chunks delimited by repeated newlines
+3) map each chunk into an array of integers
+4) sum the individual arrays of integers
+5) find the largest sum
+
+This is a pretty straightforward approach, and it can be implemented in Ruby, Crystal, and Rust in similar ways.
 
 #### Ruby solution
 
@@ -117,7 +125,16 @@ The second part of the puzzle involves expanding the search to find the top thre
 
 ### The Approach
 
-The approach to solving this is identical to part 1, except that instead of finding the `max` of the list, the final list should first be sorted, and the highest three values selected and summed.
+The approach to solving this puzzle is nearly identical to the approach used to solve part 1. The steps are as follows:
+
+1) read the input
+2) split it into chunks delimited by repeated newlines
+3) map each chunk into an array of integers
+4) sum the individual arrays of integers
+5) sort the list of sums
+6) take the last three elements of the list
+
+Here is how to make those changes to the Ruby, Crystal, and Rust solutions.
 
 #### Ruby solution
 
